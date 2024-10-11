@@ -1,14 +1,15 @@
 import { Module } from '@nestjs/common';
-import { UserController } from './controllers/user/user.controller';
-import { UserService } from './services/user/user.service';
+import { UserController } from './controllers/user.controller';
+import { UserService } from './services/user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './model/user';
 import { Post } from './model/post';
-import { PostController } from './controllers/post/post.controller';
-import { PostService } from './services/post/post.service';
+import { PostController } from './controllers/post.controller';
+import { PostService } from './services/post.service';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([User,Post]),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',
@@ -21,6 +22,9 @@ import { PostService } from './services/post/post.service';
     }),
   ],
   controllers: [UserController, PostController],
-  providers: [PostService, UserService],
+  providers: [PostService, {
+    provide: 'USER_SERVICE',
+    useClass: UserService
+  }],
 })
 export class AppModule { }
