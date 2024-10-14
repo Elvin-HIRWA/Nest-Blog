@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreatePostDto } from 'src/dtos/create-post-dto';
+import { PostResponseDto } from 'src/interfaces/post-response-dto';
 import { Post } from 'src/model/post';
 import { User } from 'src/model/user';
 import { Repository } from 'typeorm';
@@ -13,7 +14,6 @@ export class PostService {
     @InjectRepository(User)
     private readonly user: Repository<User>
 
-    // createPost(dto: CreatePostDto) {
     async createPost(createPostDto: CreatePostDto): Promise<Post> {
         const user = await this.user.findOne({ where: { id: createPostDto.userId } });
 
@@ -27,6 +27,24 @@ export class PostService {
         });
 
         return this.postRep.save(post);
+    }
+
+    async getAllPosts(): Promise<PostResponseDto[]> {
+        const posts = await this.postRep.find({
+            relations: ['user'], // This will join the User entity
+        });
+
+        // Format the posts as required
+        return posts.map(post => ({
+            title: post.title,
+            snippet: post.snippet,
+            description: post.description,
+            owner: {
+                first_name: post.user.first_name,
+                last_name: post.user.last_name,
+                isActive: post.user.isActive,
+            }
+        }));
     }
 }
 

@@ -1,4 +1,4 @@
-import { Body, Controller, Inject, Post, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Post, UsePipes, ValidationPipe } from '@nestjs/common';
 import { CreatePostDto } from 'src/dtos/create-post-dto';
 import { PostService } from 'src/services/post.service';
 
@@ -10,5 +10,10 @@ export class PostController {
     @UsePipes(ValidationPipe)
     createCustomer(@Body() dto: CreatePostDto) {
         return this.service.createPost(dto)
+    }
+
+    @Get('')
+    getAllPosts(){
+        return this.service.getAllPosts();
     }
 }
