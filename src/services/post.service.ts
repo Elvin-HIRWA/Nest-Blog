@@ -31,8 +31,11 @@ export class PostService {
 
     async getAllPosts(): Promise<PostResponseDto[]> {
         const posts = await this.postRep.find({
-            relations: ['user'], // This will join the User entity
+            relations: ['user', 'comments', 'comments.replies'], // This will join the User entity
         });
+
+        console.log(posts);
+
 
         // Format the posts as required
         return posts.map(post => ({
@@ -43,7 +46,13 @@ export class PostService {
                 first_name: post.user.first_name,
                 last_name: post.user.last_name,
                 isActive: post.user.isActive,
-            }
+            },
+            comments: post.comments.map(comment => ({
+                content: comment.title,
+                replies: comment.replies.map(reply => ({
+                    content: reply.title,
+                }))
+            }))
         }));
     }
 }
